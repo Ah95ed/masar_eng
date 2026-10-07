@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../models/notification_model.dart';
 import '../services/engineer_api.dart';
 import '../core/api_exception.dart';
 
@@ -7,73 +8,105 @@ class NotificationsProvider with ChangeNotifier {
 
   final EngineerApi api;
 
-  List<Map<String, dynamic>> _notifications = [];
+  List<NotificationModel> _items = [];
   bool _isLoading = false;
-  String? _errorMessage;
+  String? _error;
+  int _lastUnreadCount = 0;
 
-  List<Map<String, dynamic>> get notifications => _notifications;
+  List<NotificationModel> get items => _items;
+  List<NotificationModel> get notifications => _items;
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
+  String? get error => _error;
+  String? get errorMessage => _error;
+  int get unreadCount => _items.where((n) => !n.isRead).length;
 
-  int get unreadCount =>
-      _notifications.where((n) => n['is_read'] != 1).length;
-
-  Future<void> fetchNotifications() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  Future<void> fetchNotifications({
+    bool silent = false,
+    void Function(NotificationModel latestItem)? onNewNotificationReceived,
+  }) async {
+    if (!silent) {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+    }
 
     try {
-      final data = await api.get('notifications');
-      _notifications = (data as List)
-          .map((e) => Map<String, dynamic>.from(e as Map))
+      final res = await api.get('notifications');
+      List rawList = [];
+      if (res is List) {
+        rawList = res;
+      } else if (res is Map) {
+        rawList = res['notifications'] ?? res['data'] ?? [];
+      }
+
+      final fetched = rawList
+          .whereType<Map>()
+          .map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e)))
           .toList();
+
+      final currentUnread = fetched.where((n) => !n.isRead).length;
+
+      // تحقق مما إذا كان هناك إشعار جديد وصل للتو
+      if (currentUnread > _lastUnreadCount && fetched.isNotEmpty) {
+        final latest = fetched.first;
+        if (!latest.isRead && onNewNotificationReceived != null) {
+          onNewNotificationReceived(latest);
+        }
+      }
+      _lastUnreadCount = currentUnread;
+
+      _items = fetched;
       _isLoading = false;
       notifyListeners();
     } on ApiException catch (e) {
-      _errorMessage = e.message;
-      _isLoading = false;
-      notifyListeners();
+      if (!silent) {
+        _error = e.message;
+        _isLoading = false;
+        notifyListeners();
+      }
     } catch (e) {
-      _errorMessage = 'تعذر تحميل الإشعارات';
-      _isLoading = false;
-      notifyListeners();
+      if (!silent) {
+        _error = 'تعذر جلب الإشعارات';
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
-  Future<void> markAsRead(int id) async {
-    // تحديث محلي فوري
-    final index = _notifications.indexWhere((n) => n['id'] == id);
-    if (index != -1) {
-      _notifications[index]['is_read'] = 1;
+  Future<void> markAsRead(int notificationId) async {
+    final idx = _items.indexWhere((n) => n.id == notificationId);
+    if (idx != -1) {
+      _items[idx] = _items[idx].copyWith(isRead: true);
+      _lastUnreadCount = unreadCount;
       notifyListeners();
     }
 
     try {
-      await api.post('notification-read', {'notification_id': id});
+      await api.post('notification-read', {'notification_id': notificationId});
     } catch (_) {
-      // في حال الخطأ نعيد الجلب
-      await fetchNotifications();
+      await fetchNotifications(silent: true);
     }
   }
 
   Future<void> markAllAsRead() async {
-    for (var n in _notifications) {
-      n['is_read'] = 1;
+    for (int i = 0; i < _items.length; i++) {
+      _items[i] = _items[i].copyWith(isRead: true);
     }
+    _lastUnreadCount = 0;
     notifyListeners();
 
     try {
       await api.post('notification-read-all', {});
     } catch (_) {
-      await fetchNotifications();
+      await fetchNotifications(silent: true);
     }
   }
 
   void reset() {
-    _notifications = [];
+    _items = [];
     _isLoading = false;
-    _errorMessage = null;
+    _error = null;
+    _lastUnreadCount = 0;
     notifyListeners();
   }
 }
