@@ -100,28 +100,42 @@ class ReportsProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> createReport(Map<String, dynamic> reportData) async {
+  Future<int?> createReport(Map<String, dynamic> reportData) async {
     _isSaving = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await api.post('reports', reportData);
+      final res = await api.post('reports', reportData);
       _isSaving = false;
       notifyListeners();
       // تحديث قائمة التقارير تلقائياً بعد الإرسال
       await fetchReports();
-      return true;
+
+      int? reportId;
+      if (res is Map) {
+        final rawId = res['report_id'] ?? res['id'] ?? res['data']?['id'];
+        if (rawId != null) {
+          reportId = int.tryParse(rawId.toString());
+        }
+      }
+      if (reportId == null && _reports.isNotEmpty) {
+        final firstId = _reports.first['id'];
+        if (firstId != null) {
+          reportId = int.tryParse(firstId.toString());
+        }
+      }
+      return reportId ?? 0;
     } on ApiException catch (e) {
       _errorMessage = e.message;
       _isSaving = false;
       notifyListeners();
-      return false;
+      return null;
     } catch (e) {
       _errorMessage = 'تعذر إرسال التقرير';
       _isSaving = false;
       notifyListeners();
-      return false;
+      return null;
     }
   }
 

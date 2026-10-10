@@ -126,63 +126,61 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000),
-          child: RefreshIndicator(
-            onRefresh: () => reportsProv.fetchReportDetail(widget.reportId),
-            child: ListView(
-              padding: EdgeInsets.all(isWide ? 24 : 16),
-              children: [
-                _buildHeaderCard(r, isWide),
-                const SizedBox(height: 16),
-                if (isWide)
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 6,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _section('الأعمال المنجزة', '${r['work_done'] ?? '-'}', Icons.construction),
-                            _section('المشاكل والمعوقات', '${r['issues'] ?? '-'}', Icons.warning_amber),
-                            _section('المواد المستخدمة', '${r['materials_used'] ?? '-'}', Icons.inventory_2_outlined),
-                            _section('ملاحظات السلامة', '${r['safety_notes'] ?? '-'}', Icons.health_and_safety_outlined),
-                            if (r['admin_notes'] != null && (r['admin_notes'] as String).isNotEmpty)
-                              _section('ملاحظات الإدارة', '${r['admin_notes']}', Icons.admin_panel_settings_outlined),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        flex: 4,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _buildExpensesCard(expenses),
-                            const SizedBox(height: 16),
-                            _buildReceiptsCard(receipts, reportsProv),
-                          ],
-                        ),
-                      ),
-                    ],
-                  )
-                else ...[
-                  _section('الأعمال المنجزة', '${r['work_done'] ?? '-'}', Icons.construction),
-                  _section('المشاكل والمعوقات', '${r['issues'] ?? '-'}', Icons.warning_amber),
-                  _section('المواد المستخدمة', '${r['materials_used'] ?? '-'}', Icons.inventory_2_outlined),
-                  _section('ملاحظات السلامة', '${r['safety_notes'] ?? '-'}', Icons.health_and_safety_outlined),
-                  if (r['admin_notes'] != null && (r['admin_notes'] as String).isNotEmpty)
-                    _section('ملاحظات الإدارة', '${r['admin_notes']}', Icons.admin_panel_settings_outlined),
-                  const SizedBox(height: 16),
-                  _buildExpensesCard(expenses),
-                  const SizedBox(height: 16),
-                  _buildReceiptsCard(receipts, reportsProv),
-                ],
-              ],
-            ),
+      body: RefreshIndicator(
+        onRefresh: () => reportsProv.fetchReportDetail(widget.reportId),
+        child: ListView(
+          padding: EdgeInsets.symmetric(
+            horizontal: isWide ? 28 : 16,
+            vertical: 20,
           ),
+          children: [
+            _buildHeaderCard(r, isWide),
+            const SizedBox(height: 16),
+            if (isWide)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _section('الأعمال المنجزة', '${r['work_done'] ?? '-'}', Icons.construction),
+                        _section('المشاكل والمعوقات', '${r['issues'] ?? '-'}', Icons.warning_amber),
+                        _section('المواد المستخدمة', '${r['materials_used'] ?? '-'}', Icons.inventory_2_outlined),
+                        _section('ملاحظات السلامة', '${r['safety_notes'] ?? '-'}', Icons.health_and_safety_outlined),
+                        if (r['admin_notes'] != null && (r['admin_notes'] as String).isNotEmpty)
+                          _section('ملاحظات الإدارة', '${r['admin_notes']}', Icons.admin_panel_settings_outlined),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 4,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildExpensesCard(expenses),
+                        const SizedBox(height: 16),
+                        _buildReceiptsCard(receipts, reportsProv),
+                      ],
+                    ),
+                  ),
+                ],
+              )
+            else ...[
+              _section('الأعمال المنجزة', '${r['work_done'] ?? '-'}', Icons.construction),
+              _section('المشاكل والمعوقات', '${r['issues'] ?? '-'}', Icons.warning_amber),
+              _section('المواد المستخدمة', '${r['materials_used'] ?? '-'}', Icons.inventory_2_outlined),
+              _section('ملاحظات السلامة', '${r['safety_notes'] ?? '-'}', Icons.health_and_safety_outlined),
+              if (r['admin_notes'] != null && (r['admin_notes'] as String).isNotEmpty)
+                _section('ملاحظات الإدارة', '${r['admin_notes']}', Icons.admin_panel_settings_outlined),
+              const SizedBox(height: 16),
+              _buildExpensesCard(expenses),
+              const SizedBox(height: 16),
+              _buildReceiptsCard(receipts, reportsProv),
+            ],
+          ],
         ),
       ),
     );

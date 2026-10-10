@@ -9,10 +9,14 @@ class ExpenseRow extends StatelessWidget {
     required this.category,
     required this.quantity,
     required this.unitPrice,
+    this.receiptPath,
+    this.receiptName,
     required this.onItemNameChanged,
     required this.onCategoryChanged,
     required this.onQuantityChanged,
     required this.onUnitPriceChanged,
+    this.onAttachReceipt,
+    this.onRemoveReceipt,
     required this.onDelete,
   });
 
@@ -21,15 +25,20 @@ class ExpenseRow extends StatelessWidget {
   final String category;
   final double quantity;
   final double unitPrice;
+  final String? receiptPath;
+  final String? receiptName;
   final ValueChanged<String> onItemNameChanged;
   final ValueChanged<String> onCategoryChanged;
   final ValueChanged<double> onQuantityChanged;
   final ValueChanged<double> onUnitPriceChanged;
+  final VoidCallback? onAttachReceipt;
+  final VoidCallback? onRemoveReceipt;
   final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
     final isWide = Responsive.isWide(context);
+    final hasReceipt = receiptPath != null && receiptPath!.isNotEmpty;
 
     final categoryDropdown = DropdownButtonFormField<String>(
       initialValue: category,
@@ -50,6 +59,55 @@ class ExpenseRow extends StatelessWidget {
       },
     );
 
+    final receiptWidget = hasReceipt
+        ? Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF13805D).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: const Color(0xFF13805D).withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle_rounded,
+                    color: Color(0xFF13805D), size: 16),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    receiptName ?? 'وصل مرفق',
+                    style: const TextStyle(
+                      color: Color(0xFF13805D),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                InkWell(
+                  onTap: onRemoveReceipt,
+                  child: const Padding(
+                    padding: EdgeInsets.all(2),
+                    child: Icon(Icons.close_rounded,
+                        size: 14, color: Colors.red),
+                  ),
+                ),
+              ],
+            ),
+          )
+        : OutlinedButton.icon(
+            onPressed: onAttachReceipt,
+            icon: const Icon(Icons.add_a_photo_outlined, size: 15),
+            label: const Text('إرفاق وصل', style: TextStyle(fontSize: 11)),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              side: BorderSide(color: Colors.grey.shade400),
+            ),
+          );
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
       elevation: 0.8,
@@ -66,8 +124,9 @@ class ExpenseRow extends StatelessWidget {
                     child: TextFormField(
                       initialValue: itemName,
                       decoration: const InputDecoration(
-                        labelText: 'البند (مثال: أسمنت، وقود حافلة)',
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        labelText: 'البند (مثال: أسمنت، وقود، صيانة)',
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       ),
                       onChanged: onItemNameChanged,
                     ),
@@ -82,12 +141,15 @@ class ExpenseRow extends StatelessWidget {
                     flex: 1,
                     child: TextFormField(
                       initialValue: quantity == 0 ? '' : '$quantity',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(
                         labelText: 'الكمية',
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       ),
-                      onChanged: (v) => onQuantityChanged(double.tryParse(v) ?? 0),
+                      onChanged: (v) =>
+                          onQuantityChanged(double.tryParse(v) ?? 0),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -95,17 +157,26 @@ class ExpenseRow extends StatelessWidget {
                     flex: 2,
                     child: TextFormField(
                       initialValue: unitPrice == 0 ? '' : '$unitPrice',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(
                         labelText: 'سعر الوحدة',
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       ),
-                      onChanged: (v) => onUnitPriceChanged(double.tryParse(v) ?? 0),
+                      onChanged: (v) =>
+                          onUnitPriceChanged(double.tryParse(v) ?? 0),
                     ),
+                  ),
+                  const SizedBox(width: 10),
+                  SizedBox(
+                    width: 130,
+                    child: receiptWidget,
                   ),
                   const SizedBox(width: 8),
                   IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
+                    icon: const Icon(Icons.delete_outline_rounded,
+                        color: Colors.red),
                     tooltip: 'حذف البند',
                     onPressed: onDelete,
                   ),
@@ -117,7 +188,7 @@ class ExpenseRow extends StatelessWidget {
                   TextFormField(
                     initialValue: itemName,
                     decoration: const InputDecoration(
-                      labelText: 'البند',
+                      labelText: 'البند (مثال: أسمنت، وقود)',
                       border: OutlineInputBorder(),
                     ),
                     onChanged: onItemNameChanged,
@@ -130,34 +201,44 @@ class ExpenseRow extends StatelessWidget {
                       Expanded(
                         child: TextFormField(
                           initialValue: quantity == 0 ? '' : '$quantity',
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
                           decoration: const InputDecoration(
                             labelText: 'الكمية',
                             border: OutlineInputBorder(),
                           ),
-                          onChanged: (v) => onQuantityChanged(double.tryParse(v) ?? 0),
+                          onChanged: (v) =>
+                              onQuantityChanged(double.tryParse(v) ?? 0),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextFormField(
                           initialValue: unitPrice == 0 ? '' : '$unitPrice',
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
                           decoration: const InputDecoration(
                             labelText: 'سعر الوحدة',
                             border: OutlineInputBorder(),
                           ),
-                          onChanged: (v) => onUnitPriceChanged(double.tryParse(v) ?? 0),
+                          onChanged: (v) =>
+                              onUnitPriceChanged(double.tryParse(v) ?? 0),
                         ),
                       ),
                     ],
                   ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      onPressed: onDelete,
-                    ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      receiptWidget,
+                      IconButton(
+                        icon:
+                            const Icon(Icons.delete_outline, color: Colors.red),
+                        tooltip: 'حذف البند',
+                        onPressed: onDelete,
+                      ),
+                    ],
                   ),
                 ],
               ),

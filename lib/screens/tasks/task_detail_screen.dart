@@ -75,11 +75,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       appBar: AppBar(
         title: Text('${t['title']}'),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: isWide ? 860 : double.infinity),
-          child: ListView(
-            padding: EdgeInsets.all(isWide ? 24 : 16),
+      body: ListView(
+        padding: EdgeInsets.symmetric(
+          horizontal: isWide ? 28 : 16,
+          vertical: 20,
+        ),
             children: [
               // كارد معلومات المهمة الأساسية
               Card(
@@ -294,8 +294,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 }

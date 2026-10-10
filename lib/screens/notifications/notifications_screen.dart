@@ -5,6 +5,7 @@ import '../../models/notification_model.dart';
 import '../../providers/notifications_provider.dart';
 import '../../providers/tasks_provider.dart';
 import '../../providers/reports_provider.dart';
+import '../../core/responsive.dart';
 import '../../widgets/auto_refresh_wrapper.dart';
 import '../../widgets/loading_state.dart';
 import '../../widgets/empty_state.dart';
@@ -68,6 +69,7 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final prov = context.watch<NotificationsProvider>();
+    final isWide = Responsive.isWide(context);
 
     return AutoRefreshWrapper(
       interval: const Duration(seconds: 12),
@@ -87,13 +89,16 @@ class NotificationsScreen extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(
+              horizontal: isWide ? 28 : 16,
+              vertical: 10,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (prov.unreadCount > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: const Color(0xFFBD3F42).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
@@ -117,27 +122,42 @@ class NotificationsScreen extends StatelessWidget {
               ],
             ),
           ),
-        Expanded(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 850),
-                child: RefreshIndicator(
-                  onRefresh: () => prov.fetchNotifications(),
-                  child: prov.isLoading && prov.items.isEmpty
-                      ? const LoadingState(message: 'جاري تحميل الإشعارات...')
-                      : prov.items.isEmpty
-                          ? ListView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              children: const [
-                                SizedBox(height: 120),
-                                EmptyState(
-                                  message: 'لا توجد إشعارات حالياً',
-                                  icon: Icons.notifications_off_outlined,
-                                ),
-                              ],
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () => prov.fetchNotifications(),
+              child: prov.isLoading && prov.items.isEmpty
+                  ? const LoadingState(message: 'جاري تحميل الإشعارات...')
+                  : prov.items.isEmpty
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: const [
+                            SizedBox(height: 120),
+                            EmptyState(
+                              message: 'لا توجد إشعارات حالياً',
+                              icon: Icons.notifications_off_outlined,
+                            ),
+                          ],
+                        )
+                      : isWide
+                          ? GridView.builder(
+                              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 14,
+                                mainAxisSpacing: 14,
+                                mainAxisExtent: 135,
+                              ),
+                              itemCount: prov.items.length,
+                              itemBuilder: (context, index) {
+                                final item = prov.items[index];
+                                return _NotificationCard(
+                                  item: item,
+                                  onTap: () => _onNotificationTapped(context, item),
+                                );
+                              },
                             )
                           : ListView.separated(
-                              padding: const EdgeInsets.all(16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               itemCount: prov.items.length,
                               separatorBuilder: (_, _) => const SizedBox(height: 10),
                               itemBuilder: (context, index) {
@@ -148,8 +168,6 @@ class NotificationsScreen extends StatelessWidget {
                                 );
                               },
                             ),
-                ),
-              ),
             ),
           ),
         ],
