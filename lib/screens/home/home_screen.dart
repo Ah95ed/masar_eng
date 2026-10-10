@@ -7,8 +7,11 @@ import '../../providers/reports_provider.dart';
 import '../../providers/notifications_provider.dart';
 import '../../providers/dashboard_provider.dart';
 import '../../core/responsive.dart';
+import '../../models/notification_model.dart';
+import '../../services/notification_service.dart';
 import '../../widgets/notification_badge_button.dart';
 import '../../widgets/auto_refresh_wrapper.dart';
+import '../../widgets/in_app_notification_toast.dart';
 import '../tasks/tasks_screen.dart';
 import '../reports/reports_screen.dart';
 import '../reports/report_form_screen.dart';
@@ -34,6 +37,28 @@ class _HomeScreenState extends State<HomeScreen> {
     'تقاريري اليومية',
     'التنبيهات والإشعارات',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    NotificationService.onNotificationTapped = (payload) {
+      if (payload != null && payload.isNotEmpty) {
+        NotificationService.instance.handleNotificationPayload(payload);
+      } else {
+        if (mounted) setState(() => _index = 3);
+      }
+    };
+  }
+
+  void _handleNotificationTap(NotificationModel item) {
+    context.read<NotificationsProvider>().markAsRead(item.id);
+    final link = item.link;
+    if (link != null && link.isNotEmpty) {
+      NotificationService.instance.handleNotificationPayload(link);
+    } else {
+      if (mounted) setState(() => _index = 3);
+    }
+  }
 
   Future<void> _refreshAll() async {
     final tasks = context.read<TasksProvider>();
@@ -130,19 +155,20 @@ class _HomeScreenState extends State<HomeScreen> {
               dash.fetchDashboard();
             }
 
+            // 1. إظهار إشعار نظام حقيقي (شريط الإشعارات للأندرويد وتوست الويندوز)
+            NotificationService.instance.showSystemNotification(
+              id: latest.id,
+              title: latest.title,
+              body: latest.message,
+              payload: latest.link,
+            );
+
+            // 2. إظهار التوست التفاعلي العائم داخل التطبيق
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: const Color(0xFF102B3F),
-                  duration: const Duration(seconds: 4),
-                  content: Text('🔔 ${latest.title}: ${latest.message}'),
-                  action: SnackBarAction(
-                    label: 'عرض',
-                    textColor: Colors.amber,
-                    onPressed: () => setState(() => _index = 3),
-                  ),
-                ),
+              InAppNotificationToast.show(
+                context,
+                latest,
+                onTap: () => _handleNotificationTap(latest),
               );
             }
           },

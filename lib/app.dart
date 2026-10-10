@@ -8,6 +8,7 @@ import 'providers/dashboard_provider.dart';
 import 'providers/tasks_provider.dart';
 import 'providers/reports_provider.dart';
 import 'providers/notifications_provider.dart';
+import 'services/notification_service.dart';
 import 'screens/splash_screen.dart';
 
 class MaxlondEngineerApp extends StatelessWidget {
@@ -28,6 +29,7 @@ class MaxlondEngineerApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NotificationsProvider(api: api)),
       ],
       child: MaterialApp(
+        navigatorKey: NotificationService.navigatorKey,
         title: 'Maxlond Engineer',
         debugShowCheckedModeBanner: false,
         locale: const Locale('ar'),
