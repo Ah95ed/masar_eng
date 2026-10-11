@@ -217,6 +217,8 @@ class _ReportDetailScreenState extends State<ReportDetailScreen> {
                       Text(
                         '${r['site_name'] ?? 'تقرير موقع'}',
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         'التاريخ: ${r['report_date']}',

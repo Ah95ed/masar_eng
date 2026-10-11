@@ -135,6 +135,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
         title: Text(
           '${r['site_name']}',
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

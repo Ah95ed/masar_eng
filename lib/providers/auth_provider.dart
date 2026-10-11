@@ -53,6 +53,43 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> register({
+    required String fullName,
+    required String username,
+    required String email,
+    required String password,
+    String? phone,
+    String? specialization,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await api.register(
+        fullName: fullName,
+        username: username,
+        email: email,
+        password: password,
+        phone: phone,
+        specialization: specialization,
+      );
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = 'حدث خطأ غير متوقع أثناء إرسال طلب التسجيل';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     _isLoading = true;
     notifyListeners();

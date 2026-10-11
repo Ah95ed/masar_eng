@@ -65,6 +65,35 @@ class EngineerApi {
     return user;
   }
 
+  Future<Map<String, dynamic>> register({
+    required String fullName,
+    required String username,
+    required String email,
+    required String password,
+    String? phone,
+    String? specialization,
+  }) async {
+    final res = await _send(
+      method: 'POST',
+      uri: _authUri('register'),
+      body: {
+        'full_name': fullName,
+        'username': username,
+        'email': email,
+        'password': password,
+        'role': 'engineer',
+        if (phone != null && phone.isNotEmpty) 'phone': phone,
+        if (specialization != null && specialization.isNotEmpty)
+          'specialization': specialization,
+        'device_info': 'Maxlond Engineer / Flutter',
+      },
+      includeAuth: false,
+    );
+
+    final data = _decode(res);
+    return Map<String, dynamic>.from(data);
+  }
+
   Future<bool> restoreSession() async {
     await _session.restore();
     if (!_session.isAuthenticated) return false;

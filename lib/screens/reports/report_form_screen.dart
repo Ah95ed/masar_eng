@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -29,9 +30,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   final _safetyCtrl = TextEditingController();
   final _weatherCtrl = TextEditingController();
   final _tempCtrl = TextEditingController();
-  final _workersCtrl = TextEditingController(text: '0');
-  final _machineryCtrl = TextEditingController(text: '0');
-  final _progressCtrl = TextEditingController(text: '0');
+  final _workersCtrl = TextEditingController();
+  final _machineryCtrl = TextEditingController();
+  final _progressCtrl = TextEditingController();
 
   final List<Map<String, dynamic>> _expenses = [];
   final List<XFile> _reportPhotos = [];
@@ -476,41 +477,56 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     return Card(
       elevation: 0.8,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(isWide ? 20.r : 16.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
                 Icon(Icons.location_on_rounded,
-                    color: Color(0xFF13805D), size: 20),
-                SizedBox(width: 8),
+                    color: const Color(0xFF13805D), size: 22.r),
+                SizedBox(width: 8.w),
                 Text(
                   'بيانات الموقع والطقس',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF102B3F),
+                    color: const Color(0xFF102B3F),
                   ),
                 ),
               ],
             ),
-            const Divider(height: 24),
-            Row(
-              children: [
-                Expanded(flex: 3, child: _buildSiteDropdown(sites)),
-                const SizedBox(width: 14),
-                Expanded(flex: 2, child: _buildDatePicker()),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(flex: 3, child: _buildWeatherField()),
-                const SizedBox(width: 14),
-                Expanded(flex: 2, child: _buildTempField()),
-              ],
-            ),
+            Divider(height: 24.h),
+            if (isWide) ...[
+              Row(
+                children: [
+                  Expanded(flex: 3, child: _buildSiteDropdown(sites)),
+                  SizedBox(width: 14.w),
+                  Expanded(flex: 2, child: _buildDatePicker()),
+                ],
+              ),
+              SizedBox(height: 14.h),
+              Row(
+                children: [
+                  Expanded(flex: 3, child: _buildWeatherField()),
+                  SizedBox(width: 14.w),
+                  Expanded(flex: 2, child: _buildTempField()),
+                ],
+              ),
+            ] else ...[
+              // في الهاتف: واحد تحت واحد لتوفير المساحة الكاملة ومنع خروج النص عن الشاشة نهائياً
+              _buildSiteDropdown(sites),
+              SizedBox(height: 12.h),
+              _buildDatePicker(),
+              SizedBox(height: 12.h),
+              Row(
+                children: [
+                  Expanded(flex: 3, child: _buildWeatherField()),
+                  SizedBox(width: 10.w),
+                  Expanded(flex: 2, child: _buildTempField()),
+                ],
+              ),
+            ],
           ],
         ),
       ),
@@ -521,66 +537,92 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     return Card(
       elevation: 0.8,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(isWide ? 20.r : 16.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
-              children: [
-                Icon(Icons.engineering_rounded,
-                    color: Color(0xFF13805D), size: 20),
-                SizedBox(width: 8),
-                Text(
-                  'الموارد البشرية والمعدات ونسبة الإنجاز',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF102B3F),
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 24),
             Row(
               children: [
+                Icon(Icons.engineering_rounded,
+                    color: const Color(0xFF13805D), size: 22.r),
+                SizedBox(width: 8.w),
                 Expanded(
-                  child: TextFormField(
-                    controller: _workersCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'عدد العمال',
-                      prefixIcon: Icon(Icons.people_outline_rounded, size: 20),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: TextFormField(
-                    controller: _machineryCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'عدد الآليات',
-                      prefixIcon: Icon(
-                          Icons.precision_manufacturing_outlined,
-                          size: 20),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: TextFormField(
-                    controller: _progressCtrl,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'نسبة الإنجاز %',
-                      prefixIcon: Icon(Icons.trending_up_rounded, size: 20),
+                  child: Text(
+                    'الموارد البشرية والمعدات ونسبة الإنجاز',
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF102B3F),
                     ),
                   ),
                 ),
               ],
             ),
+            Divider(height: 24.h),
+            if (isWide)
+              Row(
+                children: [
+                  Expanded(child: _buildWorkersField()),
+                  SizedBox(width: 14.w),
+                  Expanded(child: _buildMachineryField()),
+                  SizedBox(width: 14.w),
+                  Expanded(child: _buildProgressField()),
+                ],
+              )
+            else
+              // بالهاتف: واحد تحت واحد لظهور اسم الحقل كاملاً وبدون أي اقتصاص
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildWorkersField(),
+                  SizedBox(height: 12.h),
+                  _buildMachineryField(),
+                  SizedBox(height: 12.h),
+                  _buildProgressField(),
+                ],
+              ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildWorkersField() {
+    return TextFormField(
+      controller: _workersCtrl,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: 'عدد العمال الميدانيين',
+        hintText: '0',
+        contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+        prefixIcon: Icon(Icons.people_outline_rounded, size: 20.r),
+      ),
+    );
+  }
+
+  Widget _buildMachineryField() {
+    return TextFormField(
+      controller: _machineryCtrl,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: 'عدد الآليات والمعدات في الموقع',
+        hintText: '0',
+        contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+        prefixIcon: Icon(Icons.precision_manufacturing_outlined, size: 20.r),
+      ),
+    );
+  }
+
+  Widget _buildProgressField() {
+    return TextFormField(
+      controller: _progressCtrl,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: 'نسبة إنجاز الأعمال اليومية (%)',
+        hintText: '0',
+        suffixText: '%',
+        contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+        prefixIcon: Icon(Icons.trending_up_rounded, size: 20.r),
       ),
     );
   }
@@ -924,15 +966,45 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
   Widget _buildSiteDropdown(List<Map<String, dynamic>> sites) {
     return DropdownButtonFormField<int>(
+      isExpanded: true,
       initialValue: _siteId,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: 'الموقع الإنشائي *',
-        contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
+        prefixIcon: Icon(Icons.apartment_rounded, size: 20.r),
       ),
+      selectedItemBuilder: (context) {
+        return sites.map((s) {
+          final code = (s['code'] != null && s['code'].toString().isNotEmpty)
+              ? ' (${s['code']})'
+              : '';
+          return Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Text(
+              '${s['name']}$code',
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: 13.5.sp,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF102B3F),
+              ),
+            ),
+          );
+        }).toList();
+      },
       items: sites.map((s) {
+        final code = (s['code'] != null && s['code'].toString().isNotEmpty)
+            ? ' (${s['code']})'
+            : '';
         return DropdownMenuItem<int>(
           value: s['id'] as int,
-          child: Text('${s['name']} (${s['code'] ?? ""})'),
+          child: Text(
+            '${s['name']}$code',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+            style: TextStyle(fontSize: 13.sp),
+          ),
         );
       }).toList(),
       onChanged: (v) => setState(() => _siteId = v),
@@ -943,14 +1015,21 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   Widget _buildDatePicker() {
     return InkWell(
       onTap: _pickDate,
+      borderRadius: BorderRadius.circular(10.r),
       child: InputDecorator(
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           labelText: 'تاريخ التقرير *',
-          suffixIcon: Icon(Icons.calendar_today_rounded),
-          contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          suffixIcon: Icon(Icons.calendar_today_rounded, size: 20.r),
+          contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
         ),
-        child: Text(_fmt(_date),
-            style: const TextStyle(fontWeight: FontWeight.w600)),
+        child: Text(
+          _fmt(_date),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 13.5.sp,
+            color: const Color(0xFF102B3F),
+          ),
+        ),
       ),
     );
   }
@@ -958,9 +1037,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   Widget _buildWeatherField() {
     return TextFormField(
       controller: _weatherCtrl,
-      decoration: const InputDecoration(
-        labelText: 'حالة الطقس (مثال: مشمس، غائم، ممطر)',
-        contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: InputDecoration(
+        labelText: 'حالة الطقس (مشمس، غائم، ممطر)',
+        prefixIcon: Icon(Icons.wb_sunny_outlined, size: 20.r),
+        contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
       ),
     );
   }
@@ -969,9 +1049,11 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     return TextFormField(
       controller: _tempCtrl,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      decoration: const InputDecoration(
-        labelText: 'درجة الحرارة (مئوية)',
-        contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: InputDecoration(
+        labelText: 'درجة الحرارة (°م)',
+        hintText: 'مثال: 32',
+        prefixIcon: Icon(Icons.thermostat_outlined, size: 20.r),
+        contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
       ),
     );
   }

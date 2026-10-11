@@ -1,11 +1,10 @@
 name: masar_eng
 description: "A new Flutter project."
-publish_to: 'none' 
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
   sdk: ^3.13.2
-
 
 dependencies:
   flutter:
@@ -26,11 +25,11 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_local_notifications: ^22.3.1
   workmanager: ^0.10.10
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
 
   flutter_lints: ^6.0.0
 
@@ -39,7 +38,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

@@ -41,6 +41,7 @@ class ExpenseRow extends StatelessWidget {
     final hasReceipt = receiptPath != null && receiptPath!.isNotEmpty;
 
     final categoryDropdown = DropdownButtonFormField<String>(
+      isExpanded: true,
       initialValue: category,
       decoration: const InputDecoration(
         labelText: 'التصنيف',
@@ -145,6 +146,7 @@ class ExpenseRow extends StatelessWidget {
                           const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(
                         labelText: 'الكمية',
+                        hintText: '0',
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       ),
@@ -161,6 +163,7 @@ class ExpenseRow extends StatelessWidget {
                           const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(
                         labelText: 'سعر الوحدة',
+                        hintText: '0',
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       ),
@@ -205,6 +208,7 @@ class ExpenseRow extends StatelessWidget {
                               decimal: true),
                           decoration: const InputDecoration(
                             labelText: 'الكمية',
+                            hintText: '0',
                             border: OutlineInputBorder(),
                           ),
                           onChanged: (v) =>
@@ -219,6 +223,7 @@ class ExpenseRow extends StatelessWidget {
                               decimal: true),
                           decoration: const InputDecoration(
                             labelText: 'سعر الوحدة',
+                            hintText: '0',
                             border: OutlineInputBorder(),
                           ),
                           onChanged: (v) =>

@@ -179,6 +179,8 @@ class _TasksScreenState extends State<TasksScreen> {
                     child: Text(
                       '${t['title']}',
                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   _buildTag(_priorityLabel(priority), _priorityColor(priority)),
@@ -193,6 +195,8 @@ class _TasksScreenState extends State<TasksScreen> {
                     child: Text(
                       '${t['site_name']}',
                       style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   _buildStatusPill(status),

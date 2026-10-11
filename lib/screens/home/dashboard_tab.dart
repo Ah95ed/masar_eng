@@ -108,48 +108,104 @@ class _DashboardTabState extends State<DashboardTab> {
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF13805D).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.post_add_rounded, color: Color(0xFF13805D), size: 28),
-                  ),
-                  const SizedBox(width: 16),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              padding: EdgeInsets.all(isDesktop ? 20 : 16),
+              child: isDesktop
+                  ? Row(
                       children: [
-                        Text(
-                          'تسجيل تقرير العمل اليومي',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF13805D).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.post_add_rounded,
+                              color: Color(0xFF13805D), size: 28),
                         ),
-                        SizedBox(height: 4),
-                        Text(
-                          'أرسل نسب الإنجاز والمواد والمصروفات الميدانية لاعتمادها من الإدارة',
-                          style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                        const SizedBox(width: 16),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'تسجيل تقرير العمل اليومي',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'أرسل نسب الإنجاز والمواد والمصروفات الميدانية لاعتمادها من الإدارة',
+                                style: TextStyle(
+                                    color: Color(0xFF64748B), fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        FilledButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    ReportFormScreen(api: widget.api),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.add, size: 18),
+                          label: const Text('تقرير جديد'),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF13805D).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.post_add_rounded,
+                                  color: Color(0xFF13805D), size: 24),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'تسجيل تقرير العمل اليومي',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    'أرسل نسب الإنجاز والمصروفات الميدانية',
+                                    style: TextStyle(
+                                        color: Color(0xFF64748B), fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        FilledButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    ReportFormScreen(api: widget.api),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.add, size: 18),
+                          label: const Text('إنشاء تقرير يومي جديد'),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  FilledButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => ReportFormScreen(api: widget.api),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.add, size: 18),
-                    label: const Text('تقرير جديد'),
-                  ),
-                ],
-              ),
             ),
           ),
 

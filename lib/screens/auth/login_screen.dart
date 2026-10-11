@@ -5,6 +5,7 @@ import '../../services/engineer_api.dart';
 import '../../providers/auth_provider.dart';
 import '../../core/responsive.dart';
 import '../home/home_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.api});
@@ -181,6 +182,39 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'تسجيل الدخول',
                                   style: TextStyle(fontSize: 16),
                                 ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'لا تملك حساباً في النظام؟',
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: auth.isLoading
+                                  ? null
+                                  : () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              RegisterScreen(api: widget.api),
+                                        ),
+                                      );
+                                    },
+                              child: Text(
+                                'تسجيل مهندس جديد',
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13.5,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
