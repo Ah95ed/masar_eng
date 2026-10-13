@@ -5,7 +5,8 @@ import '../../services/engineer_api.dart';
 import '../../providers/auth_provider.dart';
 import '../../core/responsive.dart';
 import '../home/home_screen.dart';
-import 'register_screen.dart';
+// import 'register_screen.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.api});
@@ -183,6 +184,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   style: TextStyle(fontSize: 16),
                                 ),
                         ),
+                        // قسم إنشاء الحساب معطل مؤقتاً ويمكن إعادة تفعيله في أي وقت
+                        /*
                         const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -216,6 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
+                        */
                       ],
                     ),
                   ),
